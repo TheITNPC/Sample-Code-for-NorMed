@@ -1,0 +1,95 @@
+import datetime
+
+
+class FirstAidKit:
+    def __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+
+    def sell(self, quantity):
+        if self.stock >= quantity:
+            self.stock -= quantity
+            print(f"Sold {quantity} of {self.name}.")
+            return self.price * quantity
+        else:
+            print(f"Insufficient stock for {self.name}. Only {self.stock} left.")
+            return 0
+
+    def restock(self, quantity):
+        self.stock += quantity
+        print(f"Restocked {quantity} of {self.name}. Current stock: {self.stock}")
+
+
+class Inventory:
+    def __init__(self):
+        self.kits = []
+
+    def add_kit(self, first_aid_kit):
+        self.kits.append(first_aid_kit)
+
+    def sell_kit(self, name, quantity):
+        for kit in self.kits:
+            if kit.name == name:
+                return kit.sell(quantity)
+        print(f"{name} not found in inventory.")
+        return 0
+
+    def restock_kit(self, name, quantity):
+        for kit in self.kits:
+            if kit.name == name:
+                kit.restock(quantity)
+                return
+        print(f"{name} not found in inventory.")
+
+    def get_inventory(self):
+        return {kit.name: kit.stock for kit in self.kits}
+
+
+class SalesRecord:
+    def __init__(self):
+        self.sales = []
+
+    def record_sale(self, name, quantity, total_price):
+        sale = {
+            "name": name,
+            "quantity": quantity,
+            "total_price": total_price,
+            "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        self.sales.append(sale)
+
+    def get_sales(self):
+        return self.sales
+
+
+# Example usage
+if __name__ == "__main__":
+    inventory = Inventory()
+    sales_record = SalesRecord()
+
+    # Adding some first aid kits to the inventory
+    basic_kit = FirstAidKit(name="Basic Kit", price=25.00, stock=100)
+    advanced_kit = FirstAidKit(name="Advanced Kit", price=50.00, stock=50)
+    inventory.add_kit(basic_kit)
+    inventory.add_kit(advanced_kit)
+
+    # Selling some first aid kits
+    total_price = inventory.sell_kit("Basic Kit", 2)
+    if total_price:
+        sales_record.record_sale("Basic Kit", 2, total_price)
+
+    total_price = inventory.sell_kit("Advanced Kit", 5)
+    if total_price:
+        sales_record.record_sale("Advanced Kit", 5, total_price)
+
+    # Restocking a kit
+    inventory.restock_kit("Basic Kit", 20)
+
+    # Checking inventory and sales
+    print("Current Inventory:")
+    print(inventory.get_inventory())
+
+    print("\nSales Record:")
+    for sale in sales_record.get_sales():
+        print(sale)
